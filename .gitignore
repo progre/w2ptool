@@ -1,0 +1,4 @@
+node_modules/
+tmp/
+typings/
+*gulp-tsc-tmp-*
