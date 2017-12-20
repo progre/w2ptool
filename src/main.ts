@@ -1,8 +1,11 @@
 ﻿/// <reference path="../typings/tsd.d.ts"/>
 import http = require('http');
+import child_process = require('child_process');
 var Tray = require('tray');
 var Menu = require('menu');
 var app = require('app');
+var dialog = require('dialog');
+var secret = require('./secret.json');
 
 class ToolTip {
     connection = '';
@@ -26,6 +29,8 @@ class ToolTip {
 function main() {
     var tray = new Tray(__dirname + '/img/!.png');
     tray.setContextMenu(Menu.buildFromTemplate([
+        { label: 'Wi-Fi WALKER...', click: openWiFiWalker },
+        { label: 'Reconnect', click: reconnect },
         { label: 'Quit', click: () => { app.quit(); } },
     ]));
     var toolTip = new ToolTip();
@@ -124,6 +129,30 @@ function forEach(times: number, asyncFunc: () => Promise<{}>) {
 function startInterval(func: Function, timeout?: any, ...args: any[]) {
     func();
     setInterval(func, timeout, args);
+}
+
+function openWiFiWalker() {
+    child_process.exec('start http://192.168.179.1/', {}, () => { });
+}
+
+function reconnect() {
+    var data = 'SELECT_PROFILE=1&COM_MODE_SEL=1&BTN_CLICK=profile&DISABLED_CHECKBOX=&CHECK_ACTION_MODE=1&SESSION_ID=5E72DBF8B14C1F326CE9FEBB983D75D8';
+    var options = {
+        method: 'POST',
+        host: '192.168.179.1',
+        auth: secret.username + ':' + secret.password,
+        path: '/index.cgi/index_contents_local_set',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Length': data.length
+        }
+    };
+
+    var req: http.ClientRequest = http.request(options, (res: http.ClientResponse) => {
+        dialog.showMessageBox({ message: 'Status code: ' + res.statusCode, buttons: ['OK'] });
+    });
+    req.write(data);
+    req.end();
 }
 
 main();

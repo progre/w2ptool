@@ -37,7 +37,7 @@ gulp.task('ts', () =>
         .pipe(gulp.dest('dist/resources/app/')));
 
 gulp.task('copy', () =>
-    gulp.src(['!*.ts', 'package.json', 'src/**'])
+    gulp.src(['!*.ts', 'package.json', 'src/secret.json', 'src/**'])
         .pipe(gulp.dest('dist/resources/app/')));
 
 gulp.task('download', (callback?) => {
